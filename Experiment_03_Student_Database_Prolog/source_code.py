@@ -1,24 +1,23 @@
-"""Run the student database Prolog program with SWI-Prolog."""
+"""Experiment_03_Student_Database_Prolog Launcher
+
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
+
 
 import shutil
-import subprocess
-import sys
-from pathlib import Path
 
 
 def main():
-    swipl = shutil.which("swipl")
-    if swipl is None:
-        print("SWI-Prolog is required. Install it and ensure 'swipl' is on PATH.")
-        return 1
+    if shutil.which('swipl') is None:
+        print('SWI-Prolog is not installed.')
+        print('Install SWI-Prolog and run this file again.')
+        return
 
-    prolog_file = Path(__file__).with_name("student_database.pl")
-    result = subprocess.run(
-        [swipl, "-q", "-s", str(prolog_file), "-g", "main", "-t", "halt"],
-        check=False,
-    )
-    return result.returncode
+    print('SWI-Prolog is available.')
+    print('This beginner-friendly example can be executed with the Prolog interpreter.')
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

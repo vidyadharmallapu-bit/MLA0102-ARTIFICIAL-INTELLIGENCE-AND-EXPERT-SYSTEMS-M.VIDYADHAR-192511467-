@@ -1,48 +1,51 @@
-"""Greedy best-first search using node heuristic values."""
+"""Greedy Best-First Search
 
-import heapq
-from itertools import count
-
-GRAPH = {
-    "A": [("B", 2), ("C", 1)],
-    "B": [("D", 3), ("E", 1)],
-    "C": [("F", 2)],
-    "D": [("G", 2)],
-    "E": [("G", 5)],
-    "F": [("G", 2)],
-    "G": [],
-}
-HEURISTIC = {"A": 7, "B": 5, "C": 4, "D": 2, "E": 3, "F": 1, "G": 0}
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
 
 
-def greedy_best_first(graph, heuristic, start, goal):
-    serial = count()
-    frontier = [(heuristic[start], next(serial), start)]
-    parent = {start: None}
+
+def greedy_best_first(graph, start, goal, heuristic):
+    frontier = [(heuristic[start], [start])]
     visited = set()
+
     while frontier:
-        _, _, node = heapq.heappop(frontier)
+        frontier.sort(key=lambda item: item[0])
+        _, path = frontier.pop(0)
+        node = path[-1]
+
+        if node == goal:
+            return path
+
         if node in visited:
             continue
         visited.add(node)
-        if node == goal:
-            path = []
-            while node is not None:
-                path.append(node)
-                node = parent[node]
-            return path[::-1]
-        for neighbor, _ in graph.get(node, []):
-            if neighbor not in parent:
-                parent[neighbor] = node
-                heapq.heappush(frontier, (heuristic[neighbor], next(serial), neighbor))
+
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                frontier.append((heuristic[neighbor], path + [neighbor]))
+
     return None
 
 
 def main():
-    path = greedy_best_first(GRAPH, HEURISTIC, "A", "G")
-    print("Path:", " -> ".join(path) if path else "No path found")
-    print("Weighted path cost:", sum(next(cost for neighbor, cost in GRAPH[a] if neighbor == b)
-                                      for a, b in zip(path, path[1:])))
+    graph = {
+        'S': ['A', 'B'],
+        'A': ['C'],
+        'B': ['D'],
+        'C': ['G'],
+        'D': ['G'],
+        'G': []
+    }
+    heuristic = {'S': 4, 'A': 2, 'B': 3, 'C': 1, 'D': 1, 'G': 0}
+
+    answer = greedy_best_first(graph, 'S', 'G', heuristic)
+    if answer:
+        print('Best-first path:', ' -> '.join(answer))
+    else:
+        print('No path found.')
 
 
 if __name__ == "__main__":

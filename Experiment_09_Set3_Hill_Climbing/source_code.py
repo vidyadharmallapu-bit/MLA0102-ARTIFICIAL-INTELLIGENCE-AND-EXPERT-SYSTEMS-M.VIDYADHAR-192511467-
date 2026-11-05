@@ -1,29 +1,39 @@
-"""Maximize a one-dimensional function with simple hill climbing."""
+"""Hill Climbing Demo
+
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
 
 
-def objective(x):
-    return -(x - 3) ** 2 + 9
+
+def function_value(x):
+    return -(x - 3) ** 2 + 10
 
 
-def hill_climb(start, minimum, maximum):
+def hill_climb(start, step_size, steps):
     current = start
-    visited = [current]
-    while True:
-        candidates = [x for x in (current - 1, current + 1) if minimum <= x <= maximum]
-        best = max(candidates, key=objective, default=current)
-        if objective(best) <= objective(current):
-            return visited
-        current = best
-        visited.append(current)
+    best = function_value(current)
+
+    for _ in range(steps):
+        candidates = [current - step_size, current + step_size]
+        values = [function_value(c) for c in candidates]
+        next_point = candidates[values.index(max(values))]
+        next_value = max(values)
+
+        if next_value <= best:
+            break
+
+        current = next_point
+        best = next_value
+
+    return current, best
 
 
 def main():
-    visited = hill_climb(start=-2, minimum=-5, maximum=8)
-    print("Function: f(x) = -(x - 3)^2 + 9")
-    print("States visited (x, f(x)):")
-    for x in visited:
-        print(f"({x}, {objective(x)})")
-    print(f"Maximum found: f({visited[-1]}) = {objective(visited[-1])}")
+    x, value = hill_climb(0, 0.5, 10)
+    print('Best point found:', x)
+    print('Best value:', value)
 
 
 if __name__ == "__main__":

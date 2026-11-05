@@ -1,62 +1,59 @@
-"""Solve an 8-puzzle with best-first search and misplaced-tile heuristic."""
+"""8 Puzzle Demo
 
-import heapq
-from itertools import count
-
-START = (1, 2, 3, 4, 0, 6, 7, 5, 8)
-GOAL = (1, 2, 3, 4, 5, 6, 7, 8, 0)
-
-
-def misplaced_tiles(state, goal):
-    return sum(value != 0 and value != goal[index] for index, value in enumerate(state))
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
 
 
-def neighbors(state):
-    blank = state.index(0)
-    row, col = divmod(blank, 3)
-    for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-        next_row, next_col = row + dr, col + dc
-        if 0 <= next_row < 3 and 0 <= next_col < 3:
-            target = next_row * 3 + next_col
-            child = list(state)
-            child[blank], child[target] = child[target], child[blank]
-            yield tuple(child)
+
+def is_goal(state, goal):
+    return state == goal
 
 
-def solve(start, goal):
-    serial = count()
-    frontier = [(misplaced_tiles(start, goal), 0, next(serial), start)]
-    parent, best_cost = {start: None}, {start: 0}
-    while frontier:
-        _, cost, _, state = heapq.heappop(frontier)
-        if cost != best_cost[state]:
-            continue
-        if state == goal:
-            path = []
-            while state is not None:
-                path.append(state)
-                state = parent[state]
-            return path[::-1]
-        for child in neighbors(state):
-            new_cost = cost + 1
-            if new_cost < best_cost.get(child, float("inf")):
-                best_cost[child] = new_cost
-                parent[child] = state
-                heapq.heappush(frontier, (misplaced_tiles(child, goal), new_cost, next(serial), child))
-    return None
+def possible_moves(state):
+    zero = state.index(0)
+    row, col = divmod(zero, 3)
+    moves = []
+
+    if row > 0:
+        moves.append('up')
+    if row < 2:
+        moves.append('down')
+    if col > 0:
+        moves.append('left')
+    if col < 2:
+        moves.append('right')
+    return moves
+
+
+def move_blank(state, direction):
+    zero = state.index(0)
+    row, col = divmod(zero, 3)
+    new_state = list(state)
+
+    if direction == 'up':
+        swap_index = zero - 3
+    elif direction == 'down':
+        swap_index = zero + 3
+    elif direction == 'left':
+        swap_index = zero - 1
+    elif direction == 'right':
+        swap_index = zero + 1
+    else:
+        return state
+
+    new_state[zero], new_state[swap_index] = new_state[swap_index], new_state[zero]
+    return tuple(new_state)
 
 
 def main():
-    path = solve(START, GOAL)
-    if path is None:
-        print("No solution found.")
-        return
-    print(f"Moves required: {len(path) - 1}")
-    for step, state in enumerate(path):
-        print(f"Step {step}:")
-        for row in range(0, 9, 3):
-            print(" ".join("_" if value == 0 else str(value) for value in state[row:row + 3]))
-        print()
+    start = (1, 2, 3, 4, 0, 5, 7, 8, 6)
+    goal = (1, 2, 3, 4, 5, 6, 7, 8, 0)
+    print('Start state:', start)
+    print('Goal state:', goal)
+    print('Possible moves from the blank tile:', possible_moves(start))
+    print('One sample move: ', move_blank(start, 'right'))
 
 
 if __name__ == "__main__":

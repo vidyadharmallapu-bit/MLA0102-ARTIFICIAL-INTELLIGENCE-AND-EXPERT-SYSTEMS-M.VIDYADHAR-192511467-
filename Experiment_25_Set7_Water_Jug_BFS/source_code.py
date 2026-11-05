@@ -1,58 +1,52 @@
-"""Use BFS to measure exactly four litres with 5L and 3L jugs."""
+"""Water Jug BFS Demo
 
-from collections import deque
-
-CAPACITIES = (5, 3)
-
-
-def successors(state):
-    first, second = state
-    actions = [
-        ("Fill 5L jug", (5, second)),
-        ("Fill 3L jug", (first, 3)),
-        ("Empty 5L jug", (0, second)),
-        ("Empty 3L jug", (first, 0)),
-    ]
-    transfer = min(first, CAPACITIES[1] - second)
-    actions.append(("Pour 5L -> 3L", (first - transfer, second + transfer)))
-    transfer = min(second, CAPACITIES[0] - first)
-    actions.append(("Pour 3L -> 5L", (first + transfer, second - transfer)))
-    return [(action, next_state) for action, next_state in actions if next_state != state]
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
 
 
-def solve():
-    start = (0, 0)
-    queue = deque([start])
-    parent = {start: None}
-    action_taken = {}
-    goal = None
+
+def water_jug_steps(start, goal):
+    visited = set()
+    queue = [(start, [])]
+
     while queue:
-        state = queue.popleft()
-        if 4 in state:
-            goal = state
-            break
-        for action, next_state in successors(state):
-            if next_state not in parent:
-                parent[next_state] = state
-                action_taken[next_state] = action
-                queue.append(next_state)
-    if goal is None:
-        return None
-    path = []
-    while goal is not None:
-        path.append((goal, action_taken.get(goal)))
-        goal = parent[goal]
-    return list(reversed(path))
+        state, path = queue.pop(0)
+        if state in visited:
+            continue
+        visited.add(state)
+
+        if state == goal:
+            return path + [state]
+
+        a, b = state
+        moves = [
+            ((4, b), 'Fill A'),
+            ((a, 3), 'Fill B'),
+            ((0, b), 'Empty A'),
+            ((a, 0), 'Empty B'),
+            ((max(0, a - (3 - b)), min(3, b + a)), 'Pour A to B'),
+            ((min(4, a + b), max(0, b - (4 - a))), 'Pour B to A')
+        ]
+
+        for new_state, action in moves:
+            if new_state not in visited:
+                queue.append((new_state, path + [(state, action, new_state)]))
+
+    return None
 
 
 def main():
-    path = solve()
-    if path is None:
-        print("No solution found.")
-        return
-    for step, (state, action) in enumerate(path):
-        label = "Start" if step == 0 else action
-        print(f"{step}: {label:18} -> 5L={state[0]}L, 3L={state[1]}L")
+    start = (0, 0)
+    goal = (2, 0)
+    answer = water_jug_steps(start, goal)
+    if answer:
+        print('Solution path:')
+        for step in answer:
+            print(step)
+    else:
+        print('No solution found.')
 
 
 if __name__ == "__main__":

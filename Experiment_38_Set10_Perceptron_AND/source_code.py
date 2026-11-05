@@ -1,38 +1,39 @@
-"""Train a single perceptron for the Boolean AND gate."""
+"""Perceptron AND Gate Demo
 
-TRAINING_DATA = [((0, 0), 0), ((0, 1), 0), ((1, 0), 0), ((1, 1), 1)]
-
-
-def predict(inputs, weights, bias):
-    activation = sum(value * weight for value, weight in zip(inputs, weights)) + bias
-    return 1 if activation >= 0 else 0
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
 
 
-def train(learning_rate=0.2, maximum_epochs=100):
+
+
+def perceptron_and():
     weights = [0.0, 0.0]
-    bias = 0.0
-    for epoch in range(1, maximum_epochs + 1):
-        errors = 0
-        for inputs, target in TRAINING_DATA:
-            output = predict(inputs, weights, bias)
-            error = target - output
-            if error:
-                weights = [weight + learning_rate * error * value
-                           for weight, value in zip(weights, inputs)]
+    bias = -0.5
+    learning_rate = 0.5
+    data = [
+        ([0, 0], 0),
+        ([0, 1], 0),
+        ([1, 0], 0),
+        ([1, 1], 1),
+    ]
+
+    for _ in range(20):
+        for inputs, expected in data:
+            total = sum(w * x for w, x in zip(weights, inputs)) + bias
+            prediction = 1 if total >= 0 else 0
+            error = expected - prediction
+            if error != 0:
+                for i in range(len(weights)):
+                    weights[i] += learning_rate * error * inputs[i]
                 bias += learning_rate * error
-                errors += 1
-        print(f"Epoch {epoch:2}: weights={weights}, bias={bias:.2f}, errors={errors}")
-        if errors == 0:
-            return weights, bias
-    raise RuntimeError("Perceptron did not converge within the epoch limit")
 
-
-def main():
-    weights, bias = train()
-    print("\nAND gate predictions:")
-    for inputs, expected in TRAINING_DATA:
-        print(f"{inputs} -> {predict(inputs, weights, bias)} (expected {expected})")
+    for inputs, expected in data:
+        total = sum(w * x for w, x in zip(weights, inputs)) + bias
+        prediction = 1 if total >= 0 else 0
+        print(inputs, '->', prediction, '(expected', expected, ')')
 
 
 if __name__ == "__main__":
-    main()
+    perceptron_and()

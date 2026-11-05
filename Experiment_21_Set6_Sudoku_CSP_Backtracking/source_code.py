@@ -1,53 +1,65 @@
-"""Solve a 9x9 Sudoku CSP using backtracking and minimum remaining values."""
+"""Sudoku Backtracking Demo
 
-PUZZLE = [
-    [5, 3, 0, 0, 7, 0, 0, 0, 0],
-    [6, 0, 0, 1, 9, 5, 0, 0, 0],
-    [0, 9, 8, 0, 0, 0, 0, 6, 0],
-    [8, 0, 0, 0, 6, 0, 0, 0, 3],
-    [4, 0, 0, 8, 0, 3, 0, 0, 1],
-    [7, 0, 0, 0, 2, 0, 0, 0, 6],
-    [0, 6, 0, 0, 0, 0, 2, 8, 0],
-    [0, 0, 0, 4, 1, 9, 0, 0, 5],
-    [0, 0, 0, 0, 8, 0, 0, 7, 9],
-]
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
 
 
-def candidates(board, row, column):
-    used = set(board[row])
-    used.update(board[r][column] for r in range(9))
-    box_row, box_column = row // 3 * 3, column // 3 * 3
-    used.update(board[r][c] for r in range(box_row, box_row + 3)
-                for c in range(box_column, box_column + 3))
-    return [value for value in range(1, 10) if value not in used]
+
+def print_board(board):
+    for row in board:
+        print(row)
+
+
+def is_valid(board, row, col, value):
+    for c in range(9):
+        if board[row][c] == value:
+            return False
+    for r in range(9):
+        if board[r][col] == value:
+            return False
+    start_row = (row // 3) * 3
+    start_col = (col // 3) * 3
+    for r in range(start_row, start_row + 3):
+        for c in range(start_col, start_col + 3):
+            if board[r][c] == value:
+                return False
+    return True
 
 
 def solve(board):
-    empty_cells = [
-        (len(options), row, column, options)
-        for row in range(9) for column in range(9)
-        if board[row][column] == 0
-        for options in [candidates(board, row, column)]
-    ]
-    if not empty_cells:
-        return True
-    _, row, column, options = min(empty_cells)
-    for value in options:
-        board[row][column] = value
-        if solve(board):
-            return True
-        board[row][column] = 0
-    return False
+    for row in range(9):
+        for col in range(9):
+            if board[row][col] == 0:
+                for value in range(1, 10):
+                    if is_valid(board, row, col, value):
+                        board[row][col] = value
+                        if solve(board):
+                            return True
+                        board[row][col] = 0
+                return False
+    return True
 
 
 def main():
-    board = [row.copy() for row in PUZZLE]
-    if not solve(board):
-        print("The supplied Sudoku has no solution.")
-        return
-    print("Solved Sudoku:")
-    for row in board:
-        print(" ".join(map(str, row)))
+    board = [
+        [5, 3, 0, 0, 7, 0, 0, 0, 0],
+        [6, 0, 0, 1, 9, 5, 0, 0, 0],
+        [0, 9, 8, 0, 0, 0, 0, 6, 0],
+        [8, 0, 0, 0, 6, 0, 0, 0, 3],
+        [4, 0, 0, 8, 0, 3, 0, 0, 1],
+        [7, 0, 0, 0, 2, 0, 0, 0, 6],
+        [0, 6, 0, 0, 0, 0, 2, 8, 0],
+        [0, 0, 0, 4, 1, 9, 0, 0, 5],
+        [0, 0, 0, 0, 8, 0, 0, 7, 9],
+    ]
+
+    if solve(board):
+        print('Solved board:')
+        print_board(board)
+    else:
+        print('No solution found.')
 
 
 if __name__ == "__main__":

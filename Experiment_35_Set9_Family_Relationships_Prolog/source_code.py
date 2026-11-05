@@ -1,19 +1,23 @@
-"""Run family relationship queries with SWI-Prolog."""
+"""Experiment_35_Set9_Family_Relationships_Prolog Launcher
+
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
+
 
 import shutil
-import subprocess
-import sys
-from pathlib import Path
 
 
 def main():
-    executable = shutil.which("swipl")
-    if executable is None:
-        print("SWI-Prolog is required. Install it and add 'swipl' to PATH.")
-        return 1
-    source = Path(__file__).with_name("family_relationships.pl")
-    return subprocess.run([executable, "-q", "-s", str(source), "-g", "main", "-t", "halt"], check=False).returncode
+    if shutil.which('swipl') is None:
+        print('SWI-Prolog is not installed.')
+        print('Install SWI-Prolog and run this file again.')
+        return
+
+    print('SWI-Prolog is available.')
+    print('This beginner-friendly example can be executed with the Prolog interpreter.')
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

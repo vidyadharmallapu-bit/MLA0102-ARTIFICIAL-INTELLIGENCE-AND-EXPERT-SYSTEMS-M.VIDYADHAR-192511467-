@@ -1,62 +1,52 @@
-"""Find a goal in a state-space graph using iterative deepening DFS."""
+"""Iterative Deepening DFS Demo
+
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
 
 
-GRAPH = {
-    "A": ["B", "C"],
-    "B": ["D", "E"],
-    "C": ["F", "G"],
-    "D": ["H"],
-    "E": [],
-    "F": [],
-    "G": [],
-    "H": [],
-}
 
-
-def depth_limited_search(graph, current, goal, remaining_depth, path):
-    if current == goal:
+def dls(graph, node, goal, depth, path):
+    if node == goal:
         return path
-    if remaining_depth == 0:
+    if depth == 0:
         return None
 
-    for neighbor in graph.get(current, []):
-        if neighbor not in path:
-            result = depth_limited_search(
-                graph, neighbor, goal, remaining_depth - 1, path + [neighbor]
-            )
-            if result is not None:
-                return result
+    for neighbor in graph.get(node, []):
+        if neighbor in path:
+            continue
+        answer = dls(graph, neighbor, goal, depth - 1, path + [neighbor])
+        if answer is not None:
+            return answer
     return None
 
 
-def iterative_deepening_search(graph, start, goal):
-    if start not in graph or goal not in graph:
-        return None
-
-    for depth_limit in range(len(graph)):
-        result = depth_limited_search(graph, start, goal, depth_limit, [start])
-        if result is not None:
-            return result
+def iddfs(graph, start, goal):
+    for depth in range(len(graph) + 1):
+        path = dls(graph, start, goal, depth, [start])
+        if path is not None:
+            return path
     return None
 
 
 def main():
-    print("State-space graph:")
-    for node, neighbors in GRAPH.items():
-        print(f"  {node}: {', '.join(neighbors) if neighbors else '(no children)'}")
+    graph = {
+        'A': ['B', 'C'],
+        'B': ['D', 'E'],
+        'C': ['F', 'G'],
+        'D': ['H'],
+        'E': [],
+        'F': [],
+        'G': [],
+        'H': []
+    }
 
-    start = input("Enter the initial node [A]: ").strip().upper() or "A"
-    goal = input("Enter the goal node [G]: ").strip().upper() or "G"
-
-    if start not in GRAPH or goal not in GRAPH:
-        print("Error: both nodes must exist in the displayed graph.")
-        return
-
-    path = iterative_deepening_search(GRAPH, start, goal)
-    if path:
-        print("Path:", " -> ".join(path))
+    result = iddfs(graph, 'A', 'G')
+    if result:
+        print('Path found:', ' -> '.join(result))
     else:
-        print(f"No path found from {start} to {goal}.")
+        print('No path found.')
 
 
 if __name__ == "__main__":

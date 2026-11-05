@@ -1,49 +1,47 @@
-"""Solve the 3-missionaries, 3-cannibals river crossing with DFS."""
+"""Depth-First Search Demo
 
-START = (3, 3, 0)  # missionaries left, cannibals left, boat: 0 left / 1 right
-GOAL = (0, 0, 1)
-BOAT_LOADS = ((2, 0), (0, 2), (1, 1), (1, 0), (0, 1))
-
-
-def safe(missionaries, cannibals):
-    return (missionaries == 0 or missionaries >= cannibals) and (
-        3 - missionaries == 0 or 3 - missionaries >= 3 - cannibals
-    )
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
 
 
-def successors(state):
-    missionaries, cannibals, boat = state
-    direction = -1 if boat == 0 else 1
-    for moved_m, moved_c in BOAT_LOADS:
-        next_m = missionaries + direction * moved_m
-        next_c = cannibals + direction * moved_c
-        if 0 <= next_m <= 3 and 0 <= next_c <= 3 and safe(next_m, next_c):
-            yield (next_m, next_c, 1 - boat)
 
+def dfs(graph, start, goal, visited=None):
+    if visited is None:
+        visited = set()
 
-def depth_first_search(state=START, path=None, visited=None):
-    path = [state] if path is None else path
-    visited = set() if visited is None else visited
-    if state == GOAL:
-        return path
-    visited.add(state)
-    for next_state in successors(state):
-        if next_state not in visited:
-            result = depth_first_search(next_state, path + [next_state], visited)
-            if result:
-                return result
+    if start == goal:
+        return [start]
+
+    visited.add(start)
+
+    for neighbor in graph.get(start, []):
+        if neighbor in visited:
+            continue
+
+        result = dfs(graph, neighbor, goal, visited)
+        if result is not None:
+            return [start] + result
+
     return None
 
 
 def main():
-    path = depth_first_search()
-    if path is None:
-        print("No solution found.")
-        return
-    for step, (missionaries, cannibals, boat) in enumerate(path):
-        side = "left" if boat == 0 else "right"
-        print(f"{step}: left=({missionaries}M,{cannibals}C), "
-              f"right=({3-missionaries}M,{3-cannibals}C), boat={side}")
+    graph = {
+        'S': ['A', 'B'],
+        'A': ['C'],
+        'B': ['D'],
+        'C': ['G'],
+        'D': ['G'],
+        'G': []
+    }
+
+    path = dfs(graph, 'S', 'G')
+    if path:
+        print('Path found:', ' -> '.join(path))
+    else:
+        print('No path found.')
 
 
 if __name__ == "__main__":

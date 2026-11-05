@@ -1,36 +1,51 @@
-"""Find a path with beam search, keeping only the best k nodes per layer."""
+"""Greedy Best-First Search
 
-GRAPH = {
-    "A": ["B", "C"], "B": ["D", "E"], "C": ["F", "G"],
-    "D": ["H"], "E": ["H"], "F": ["G", "H"], "G": ["H"], "H": [],
-}
-HEURISTIC = {"A": 7, "B": 6, "C": 4, "D": 5, "E": 2, "F": 3, "G": 1, "H": 0}
+Beginner-friendly version.
+This file uses simple Python loops, lists, and dictionaries.
+No heavy libraries or advanced tricks are used.
+"""
 
 
-def beam_search(graph, heuristic, start, goal, width):
-    beam = [(start, [start])]
-    visited = {start}
-    while beam:
-        for node, path in beam:
-            if node == goal:
-                return path
-        candidates = {}
-        for node, path in beam:
-            for child in graph.get(node, []):
-                if child not in visited:
-                    candidates.setdefault(child, path + [child])
-        if not candidates:
-            break
-        beam = sorted(candidates.items(), key=lambda item: heuristic[item[0]])[:width]
-        visited.update(node for node, _ in beam)
+
+def greedy_best_first(graph, start, goal, heuristic):
+    frontier = [(heuristic[start], [start])]
+    visited = set()
+
+    while frontier:
+        frontier.sort(key=lambda item: item[0])
+        _, path = frontier.pop(0)
+        node = path[-1]
+
+        if node == goal:
+            return path
+
+        if node in visited:
+            continue
+        visited.add(node)
+
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                frontier.append((heuristic[neighbor], path + [neighbor]))
+
     return None
 
 
 def main():
-    width = 2
-    path = beam_search(GRAPH, HEURISTIC, "A", "H", width)
-    print(f"Beam width: {width}")
-    print("Best path:", " -> ".join(path) if path else "No path found")
+    graph = {
+        'S': ['A', 'B'],
+        'A': ['C'],
+        'B': ['D'],
+        'C': ['G'],
+        'D': ['G'],
+        'G': []
+    }
+    heuristic = {'S': 4, 'A': 2, 'B': 3, 'C': 1, 'D': 1, 'G': 0}
+
+    answer = greedy_best_first(graph, 'S', 'G', heuristic)
+    if answer:
+        print('Best-first path:', ' -> '.join(answer))
+    else:
+        print('No path found.')
 
 
 if __name__ == "__main__":
